@@ -1,14 +1,66 @@
+const Mixin = {
+  getDefaultProps() {
+    console.log('Mixin getDefaultProps');
+    return {
+    };
+  },
+  getInitialState() {
+    console.log('Mixin getInitialState');
+    return {
+      mixinCount: 1
+    };
+  },
+  componentWillMount() {
+    console.log('Mixin componentWillMount');
+    return true;
+  },
+  componentDidMount() {
+    console.log('Mixin componentDidMount');
+  },
+  componentWillUnmount() {
+    console.log('Mixin componentWillMount');
+  },
+  componentDidUpdate(prevProps, prevState) {
+    console.log('Mixin componentDidUpdate');
+  },
+  componentWillReceiveProps(nextProps) {
+    console.log('Mixin componentWillReceiveProps', arguments);
+  },
+};
 
-var Todo = React.createClass({
-  propTypes: {
-    todo: React.PropTypes.shape({
-      id: React.PropTypes.number.isRequired,
-      text: React.PropTypes.string.isRequired
-    }),
-    onDelete: React.PropTypes.func.isRequired
+const Todo = React.createClass({
+  mixins: [Mixin],
+  getDefaultProps() {
+    console.log('Todo getDefaultProps');
+    return {
+    };
+  },
+  getInitialState() {
+    console.log('Todo getInitialState');
+    return {
+      count: this.props.count,
+      localCount: 1
+    };
   },
   componentWillMount() {
     console.log('Todo componentWillMount');
+  },
+  componentDidMount() {
+    console.log('Todo componentDidMount');
+  },
+  componentWillUnmount() {
+    debugger;
+    console.log('Todo componentWillUnmount');
+  },
+  shouldComponentUpdate(nextProps, nextState) {
+    console.log('Todo shouldComponentUpdate');
+    return true;
+  },
+  componentWillUpdate(nextProps, nextState) {
+    console.log('Todo componentWillUpdate');
+  },
+  componentDidUpdate(prevProps, prevState) {
+    console.log('Todo componentDidUpdate');
   },
   componentWillReceiveProps(nextProps) {
     console.log('Todo componentWillReceiveProps', arguments);
@@ -16,27 +68,31 @@ var Todo = React.createClass({
       count: nextProps.count
     });
   },
-  getInitialState() {
-    console.log('Todo getInitialState');
-    return {
-      count: this.props.count
-    };
+  _countUp() {
+    this.setState({
+      localCount: this.state.localCount + 1
+    });
   },
   render() {
     console.log('Todo render', this.state);
     return (
       <div>
-        <span>{this.props.todo.text}: </span>
-        <span>state.count = {this.state.count}</span>
-        {/*
-        <span>{this.props.count}a</span>
-        */}
+        <div>{this.props.todo.text}: </div>
+        <div>props.count = {this.props.count}</div>
+        <div>state.count = {this.state.count}</div>
+        <div>state.localCount = {this.state.localCount}</div>
+        <button onClick={this._countUp}>countUp</button>
       </div>
     );
   }
 });
 
 var TodoList = React.createClass({
+  getDefaultProps() {
+    console.log('TodoList getDefaultProps');
+    return {
+    };
+  },
   getInitialState() {
     console.log('TodoList getInitialState');
     return {
@@ -52,8 +108,24 @@ var TodoList = React.createClass({
       count: this.state.count + 1
     });
   },
+  componentWillMount() {
+    console.log('TodoList componentWillMount');
+  },
   componentDidMount() {
     console.log('TodoList componentDidMount');
+  },
+  componentWillUnmount() {
+    console.log('TodoList componentWillUnmount');
+  },
+  shouldComponentUpdate(nextProps, nextState) {
+    console.log('TodoList shouldComponentUpdate');
+    return true;
+  },
+  componentWillUpdate(nextProps, nextState) {
+    console.log('TodoList componentWillUpdate');
+  },
+  componentDidUpdate(prevProps, prevState) {
+    console.log('TodoList componentDidUpdate');
   },
   componentWillReceiveProps(nextProps) {
     console.log('TodoList componentWillReceiveProps', arguments);
@@ -63,11 +135,11 @@ var TodoList = React.createClass({
     var todos = this.state.todos.map((todo) => {
       return (
         <li key={todo.id}>
-          <Todo onDelete={this.deleteTodo} todo={todo} count={this.state.count}/>
+          <Todo todo={todo} count={this.state.count}/>
         </li>
       );
     });
-    var c = (
+    const c = (
       <ul>
         {todos}
         <button onClick={this._handleClickIncrementCounter}>Increment Counter</button>
@@ -79,165 +151,3 @@ var TodoList = React.createClass({
 });
 
 React.render(<TodoList />, document.body);
-
-// /**
-//  * This file provided by Facebook is for non-commercial testing and evaluation purposes only.
-//  * Facebook reserves all rights not expressly granted.
-//  *
-//  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-//  * FACEBOOK BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-//  * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-//  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//  */
-
-// var Comment = React.createClass({
-//   render: function() {
-//     var rawMarkup = marked(this.props.children.toString(), {sanitize: true});
-//     var a = 'neko';
-//     return (
-//       <div className="comment">
-//         <h2 className="commentAuthor">
-//           <div>{a}</div>
-//           {this.props.author}bb
-//         </h2>
-//         <span dangerouslySetInnerHTML={{__html: rawMarkup}} />
-//       </div>
-//     );
-//   }
-// });
-
-// var CommentBox = React.createClass({
-//   loadCommentsFromServer: function() {
-//     $.ajax({
-//       url: this.props.url,
-//       dataType: 'json',
-//       cache: false,
-//       success: function(data) {
-//         this.setState({data: data});
-//       }.bind(this),
-//       error: function(xhr, status, err) {
-//         console.error(this.props.url, status, err.toString());
-//       }.bind(this)
-//     });
-//   },
-//   handleCommentSubmit: function(comment) {
-//     var comments = this.state.data;
-//     comments.push(comment);
-//     this.setState({data: comments}, function() {
-//       // `setState` accepts a callback. To avoid (improbable) race condition,
-//       // `we'll send the ajax request right after we optimistically set the new
-//       // `state.
-//       $.ajax({
-//         url: this.props.url,
-//         dataType: 'json',
-//         type: 'POST',
-//         data: comment,
-//         success: function(data) {
-//           this.setState({data: data});
-//         }.bind(this),
-//         error: function(xhr, status, err) {
-//           console.error(this.props.url, status, err.toString());
-//         }.bind(this)
-//       });
-//     });
-//   },
-//   getInitialState: function() {
-//     return {
-//       data: [],
-//       count: 2
-//     };
-//   },
-//   componentDidMount: function() {
-//     this.loadCommentsFromServer();
-//     // setInterval(this.loadCommentsFromServer, this.props.pollInterval);
-//   },
-//   handleClick: function() {
-//     console.log(this.props.children);
-//     // this.setState({count: this.state.count + 1});
-//   },
-//   render: function() {
-//     var click = this.handleClick.bind(this);
-//     return (
-//       <div className="commentBox" onClick={click}>
-//         <neko>neko</neko>
-//         <h1>Comments2</h1>
-//         <div>{this.state.count}</div>
-//         <CommentList data={this.state.data} neko="nekotest"/>
-//         <CommentForm onCommentSubmit={this.handleCommentSubmit} />
-//       </div>
-//     );
-//   }
-// });
-
-// var Comment = React.createClass({
-//   render: function() {
-//     var rawMarkup = marked(this.props.children.toString(), {sanitize: true});
-//     var a = 'neko';
-//     return (
-//       <div className="comment">
-//         <h2 className="commentAuthor">
-//           <div>{a}</div>
-//           {this.props.author}bb
-//         </h2>
-//         <span dangerouslySetInnerHTML={{__html: rawMarkup}} />
-//       </div>
-//     );
-//   }
-// });
-
-// var CommentList = React.createClass({
-//   getDefaultProps: function() {
-//     return {
-//       count: 1
-//     };
-//   },
-//   render: function() {
-//     var that = this;
-//     var commentNodes = this.props.data.map(function(comment, index) {
-//       console.log(that.props);
-//       return (
-//         // `key` is a React-specific concept and is not mandatory for the
-//         // purpose of this tutorial. if you're curious, see more here:
-//         // http://facebook.github.io/react/docs/multiple-components.html#dynamic-children
-//         <Comment author={comment.author} key={index}>
-//           {comment.text} {that.props.neko} {that.props.count}
-//         </Comment>
-//       );
-//     });
-//     return (
-//       <div className="commentList">
-//         {commentNodes}
-//       </div>
-//     );
-//   }
-// });
-
-// var CommentForm = React.createClass({
-//   handleSubmit: function(e) {
-//     e.preventDefault();
-//     var author = React.findDOMNode(this.refs.author).value.trim();
-//     var text = React.findDOMNode(this.refs.text).value.trim();
-//     if (!text || !author) {
-//       return;
-//     }
-//     this.props.onCommentSubmit({author: author, text: text});
-//     React.findDOMNode(this.refs.author).value = '';
-//     React.findDOMNode(this.refs.text).value = '';
-//   },
-//   render: function() {
-//     return (
-//       <form className="commentForm" onSubmit={this.handleSubmit}>
-//         <input type="text" placeholder="Your name" ref="author" />
-//         <input type="text" placeholder="Say something..." ref="text" />
-//         <input type="submit" value="Post" />
-//       </form>
-//     );
-//   }
-// });
-
-// React.render(
-//   <CommentBox url="comments.json" pollInterval={2000} />,
-//   document.getElementById('content')
-// );
